@@ -1,0 +1,27 @@
+[
+    {
+        
+        "model":"med_blog.Post",
+        "pk":1,
+        "fields":{
+        "title":"Post One",
+         "body":"lorem",
+         "category":1   
+    
+    
+    }
+    }
+    ,
+    {
+        
+        "model":"med_blog.Post",
+        "pk":2,
+        "fields":{
+        "title":"Post Two",
+         "body":"lorem",
+         "category":2  
+    
+    
+    }
+    }
+]

@@ -1,0 +1,9 @@
+[
+    {
+        
+        "model":"med_blog.category",
+        "pk":2,
+        "fields":{
+        "name":"Dietary Health"}
+    }
+]

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+    {% if message.tags == 'error' %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{message}}</strong> 
+          </div>
+    {% else %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>{{message}}</strong> 
+              </div>
+    {% endif %}
+    {% endfor %}
+{% endif %}
+<div class="row">
+    <div class="col-md-8">
+<h1>Hello  {{request.user.username}}</h1>
+</div>
+<div class="col-md-4">
+<a href="{% url 'patient-update' request.user.id %}" class="btn btn-primary">Update Profile</a>
+</div>
+</div>
+<div class="row py-3">
+    <div class="col">
+{% if appointment %}
+<h3>Your appointment date</h3>
+
+{{appointment.appointment_date}}
+{% else  %}
+You dont have an appointment.
+{% endif %}
+</div>
+</div>
+{% if medications %}
+
+<h3>Your prescribed medications</h3>
+<div class="row py-3">
+
+{% for medication in medications %}
+<div class="col-md-4">
+<div class="card">
+    <div class="card-body">
+      <h4 class="card-title">{{medication.name}}</h4>
+      <p class="card-text">
+       {{medication.instructions}}
+      </p>
+      <a href="{% url 'refill-request' %}" class="btn btn-primary">Request a refill</a>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% else %}
+
+<p>You are not currently perscribed any medications.</p>
+{% endif %}
+</div>
+
+{% endblock %}

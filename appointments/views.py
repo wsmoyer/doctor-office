@@ -65,7 +65,7 @@ class ViewAppointment(LoginRequiredMixin,DetailView):
 
 class UpdatePatient(LoginRequiredMixin,UpdateView):
     model = Patient
-    fields = ('first_name','last_name','doctor','email','insurance_provider','preferred_pharmacy')
+    fields = ('first_name','last_name','doctor','email','insurance_provider','preferred_pharmacy','phone_number')
     def form_valid(self,form):
 
         messages.success(self.request,"Your profile has been updated.")

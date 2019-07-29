@@ -46,7 +46,7 @@ class Patient(AbstractUser):
     insurance_provider = models.ForeignKey(Provider,on_delete=models.DO_NOTHING,blank=True,null=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # validators should be a list
-    preferred_pharmacy = models.ForeignKey(RegisteredPharmacyLocations,on_delete=models.DO_NOTHING,null=True)
+    preferred_pharmacy = models.ForeignKey(RegisteredPharmacyLocations,on_delete=models.DO_NOTHING,null=True,blank=True)
 
 def get_deadline():
     return date.today() + timedelta(days=7)
@@ -77,21 +77,27 @@ class Appointment(models.Model):
 
 class Medication(models.Model):
     name = models.CharField(max_length=50)
-    perscribed_to = models.ForeignKey(Patient,on_delete=models.DO_NOTHING)
-    perscribed_by = models.ForeignKey(Doctor,on_delete=models.DO_NOTHING)
+    
     instructions = models.TextField()
     price = models.DecimalField(max_digits=6,decimal_places=2,blank=True,null=True)
     def __str__(self):
         return self.name
 
+class Prescription(models.Model):
+    medication = models.ForeignKey(Medication,on_delete=models.CASCADE)
+    perscribed_to = models.ForeignKey('Patient',related_name='patient_set',on_delete=models.DO_NOTHING)
+    perscribed_by = models.ForeignKey('Patient',related_name='doctor_set',on_delete=models.DO_NOTHING,null=True)
+    date_prescribed = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.medication.name)    
 
 
 class PrescriptionRefillRequest(models.Model):
-    medication = models.ForeignKey(Medication,on_delete=models.CASCADE,null=True)
+    medication = models.ForeignKey(Prescription,on_delete=models.CASCADE,null=True)
     requested_by = models.ForeignKey(Patient,on_delete=models.CASCADE,null=True)
     date_requested = models.DateField(auto_now_add=True)
 
 
-    def __str__(self):
-        return self.medication
+   
 

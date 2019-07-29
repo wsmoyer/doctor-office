@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% if messages %}
+<ul>
+	{% for message in messages %}
+	   <li>{{ message }}</li>
+	{% endfor %}
+</ul>
+
+{% endif %}
+<h1>Prescribe Medication</h1>
+<form method='post'>
+
+{% csrf_token %}
+{{ form.media }}
+
+{{form | crispy}}
+<input type='submit' class="btn btn-block btn-primary" value="Submit"/>
+</form>
+ 
+
+ {% endblock %} 

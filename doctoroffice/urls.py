@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.contrib.auth import views as auth_views
-from appointments.views import Index,MakeAppointment,ViewAppointment,UpdatePatient,RefillRequest,DoctorContactForm
+from appointments.views import Index,MakeAppointment,ViewAppointment,UpdatePatient,RefillRequest,DoctorContactForm,PrescriptionCreate,UserRegistration
 from med_blog.views import PostList
 
 
@@ -24,11 +24,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login',auth_views.LoginView.as_view(template_name='login.html'),name='login'),
     path('logout',auth_views.LogoutView.as_view(template_name='index.html'),name='logout'),
+    path('register',UserRegistration.as_view(),name='register'),
     path('',Index.as_view(),name='home'),
     path('appointments/make',MakeAppointment.as_view(),name="make-appointment"),
     path('blog/', include('med_blog.urls')),
     path('appointment/<int:pk>',ViewAppointment.as_view(),name='appointment-detail'),
     path('patient/<int:pk>',UpdatePatient.as_view(),name='patient-update'),
     path('request-refill',RefillRequest.as_view(),name='refill-request'),
-    path('contact-doctor',DoctorContactForm.as_view())
+    path('contact-doctor',DoctorContactForm.as_view()),
+    path('prescription-create',PrescriptionCreate.as_view(),name='create-prescription')
     ]

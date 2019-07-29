@@ -20,16 +20,31 @@
     {% endif %}
     {% endfor %}
 {% endif %}
+{% if user.is_staff %}
 <div class="row">
-    <div class="col-md-8">
-<h1>Hello  {{request.user.username}}</h1>
+  <div class="col-md-8">
+<h1>Hello  {{user.username}}</h1>
+<a href="{% url 'create-prescription' %}">Create Prescription</a>
+</div>
+
+</div>
+
+
+
+{% comment %}
+this is for if they are a patient
+{% endcomment %}
+{% else %}
+<div class="row">
+  <div class="col-md-8">
+<h1>Hello  {{user.username}}</h1>
 </div>
 <div class="col-md-4">
 <a href="{% url 'patient-update' request.user.id %}" class="btn btn-primary">Update Profile</a>
 </div>
 </div>
 <div class="row py-3">
-    <div class="col">
+  <div class="col">
 {% if appointment %}
 <h3>Your appointment date</h3>
 
@@ -39,29 +54,36 @@ You dont have an appointment.
 {% endif %}
 </div>
 </div>
-{% if medications %}
+{% if prescriptions %}
 
 <h3>Your prescribed medications</h3>
 <div class="row py-3">
 
-{% for medication in medications %}
+{% for prescription in prescriptions %}
 <div class="col-md-4">
 <div class="card">
-    <div class="card-body">
-      <h4 class="card-title">{{medication.name}}</h4>
-      <p>${{medication.price}} per month</p>
-      <p class="card-text">
-       {{medication.instructions}}
-      </p>
-      <a href="{% url 'refill-request' %}" class="btn btn-primary">Request a refill</a>
-    </div>
+  <div class="card-body">
+    <h4 class="card-title">{{medication.name}}</h4>
+    <p>${{medication.price}} per month</p>
+    <p class="card-text">
+     {{medication.instructions}}
+    </p>
+    <a href="{% url 'refill-request' %}" class="btn btn-primary">Request a refill</a>
   </div>
+</div>
 </div>
 {% endfor %}
 {% else %}
 
 <p>You are not currently perscribed any medications.</p>
 {% endif %}
+{% if doctors %}
+{% for doctor in doctors %}
+{{doctor.first_name}}
+{% endfor %}
+{% endif %}
 </div>
+{% endif %}
+
 
 {% endblock %}

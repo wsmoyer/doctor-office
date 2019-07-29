@@ -2,27 +2,29 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView,DetailView,CreateView
 from django.views.generic.edit import UpdateView,FormView
-from .models import Appointment,Patient,Medication,PrescriptionRefillRequest
-from .forms import MakeAppointmentForm,RefillForm,DoctorContactForm
+from .models import Appointment,Patient,Medication,PrescriptionRefillRequest,Doctor,Prescription
+from .forms import MakeAppointmentForm,RefillForm,DoctorContactForm,DoctorPerscriptionForm,UserRegister
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.contrib import messages
 from datetime import datetime,timedelta
 from django.core.exceptions import ObjectDoesNotExist
-
+from .mixins import DocAccessMixin
 
 # Create your views here.
 class Index(LoginRequiredMixin,TemplateView):
     template_name = 'index.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['medications'] = Medication.objects.filter(perscribed_to=self.request.user.id)
+        if not self.request.user.is_staff:
+            context['prescriptions'] = Prescription.objects.filter(perscribed_to=self.request.user.id)
+            try:
+                context['appointment'] =  Appointment.objects.get(patient=self.request.user.id)
+            except ObjectDoesNotExist:
+                pass
+        else:
+            context['doctors'] = Doctor.objects.all()
 
-        try:
-            context['appointment'] =  Appointment.objects.get(patient=self.request.user.id)
-            return context
-        except ObjectDoesNotExist:
-            pass
         return context
     
 
@@ -47,9 +49,9 @@ class MakeAppointment(LoginRequiredMixin,CreateView):
         
             
         else:
-            # email = self.object.email            
-            # send_mail('Doctor Appointment Confirmation',f'Your Appointment has been scheduled for {self.object.appointment_date}','wsmoyer313@gmail.com',[email],fail_silently=False)
-            # messages.success(self.request,"Your appointment has been scheduled")
+            email = self.object.email            
+            send_mail('Doctor Appointment Confirmation',f'Your Appointment has been scheduled for {self.object.appointment_date}','wsmoyer313@gmail.com',[email],fail_silently=False)
+            messages.success(self.request,"Your appointment has been scheduled")
 
             self.object.save()
             return redirect('/')
@@ -78,6 +80,9 @@ class RefillRequest(LoginRequiredMixin,CreateView):
     model = PrescriptionRefillRequest
     template_name = 'refill_request.html'
     form_class = RefillForm
+    
+    
+
     def form_valid(self,form):
         self.object = form.save(commit=False)
         self.object.requested_by = self.request.user
@@ -96,3 +101,22 @@ class DoctorContactForm(LoginRequiredMixin,FormView):
         form.send_email()
         messages.success(self.request,"Your have successfully sent an email to your doctor.")
         return super().form_valid(form)
+
+
+class PrescriptionCreate(DocAccessMixin,CreateView):
+    model = Medication
+    template_name = 'prescription_create.html'
+    form_class = DoctorPerscriptionForm
+    def form_valid(self,form):
+        self.object = form.save(commit=False)
+        self.object.perscribed_by = self.request.user
+        messages.success(self.request,"Refill request has been submitted.")
+
+        self.object.save()
+        return redirect('/')
+
+
+class UserRegistration(CreateView):
+    model = Patient
+    template_name = 'register_form.html'
+    form_class = UserRegister
